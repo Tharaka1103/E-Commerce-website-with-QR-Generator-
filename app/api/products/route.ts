@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     const productId = `QR${String(count + 1).padStart(7, '0')}`;
     
     // Generate QR code
-    const qrCodeData = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}?productId=${productId}`;
+    const qrCodeData = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://eshop.trimids.com'}?productId=${productId}`;
     const qrCodeImage = await QRCode.toDataURL(qrCodeData);
     
     const product = {
