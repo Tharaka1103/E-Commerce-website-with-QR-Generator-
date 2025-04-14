@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
-import fs from 'fs/promises';
 import path from 'path';
+import { deleteFile } from '@/lib/fileUtils';
 
 export async function GET(request: NextRequest) {
   try {
@@ -46,17 +46,7 @@ export async function PUT(request: NextRequest) {
     
     // If the image has been changed, delete the old image
     if (data.imageUrl && data.imageUrl !== currentProduct.imageUrl) {
-      try {
-        // Extract filename from the old URL
-        const oldImagePath = currentProduct.imageUrl.replace(/^\/uploads\//, '');
-        if (oldImagePath) {
-          const fullPath = path.join(process.cwd(), 'public/uploads', oldImagePath);
-          await fs.unlink(fullPath);
-          console.log(`Deleted old image: ${fullPath}`);
-        }
-      } catch (error) {
-        console.error('Error deleting old image file:', error);
-      }
+      await deleteFile(currentProduct.imageUrl);
     }
     
     return NextResponse.json(updatedProduct);
@@ -85,17 +75,7 @@ export async function DELETE(request: NextRequest) {
     
     // Delete the image file
     if (product.imageUrl) {
-      try {
-        // Extract filename from URL
-        const imagePath = product.imageUrl.replace(/^\/uploads\//, '');
-        if (imagePath) {
-          const fullPath = path.join(process.cwd(), 'public/uploads', imagePath);
-          await fs.unlink(fullPath);
-          console.log(`Deleted image: ${fullPath}`);
-        }
-      } catch (error) {
-        console.error('Error deleting image file:', error);
-      }
+      await deleteFile(product.imageUrl);
     }
     
     return NextResponse.json({ success: true, message: `Product ${id} deleted successfully` });

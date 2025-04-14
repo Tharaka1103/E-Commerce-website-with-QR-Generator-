@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, unlink } from 'fs/promises';
+import { writeFile } from 'fs/promises';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -28,23 +28,5 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error uploading file:', error);
     return NextResponse.json({ error: "Error uploading file" }, { status: 500 });
-  }
-}
-
-// Helper function to delete a file
-export async function deleteFile(fileUrl: string) {
-  try {
-    if (!fileUrl || !fileUrl.startsWith('/uploads/')) {
-      throw new Error('Invalid file URL');
-    }
-
-    const fileName = fileUrl.replace('/uploads/', '');
-    const filePath = path.join(process.cwd(), 'public/uploads', fileName);
-    
-    await unlink(filePath);
-    return true;
-  } catch (error) {
-    console.error('Error deleting file:', error);
-    return false;
   }
 }
