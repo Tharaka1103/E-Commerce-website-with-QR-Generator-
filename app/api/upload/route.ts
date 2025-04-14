@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, unlink } from 'fs/promises';
-import path from 'path';
+import { put } from '@vercel/blob';
 import { v4 as uuidv4 } from 'uuid';
 
 export async function POST(request: NextRequest) {
@@ -12,19 +11,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    
     // Create a unique filename
     const fileName = `${uuidv4()}_${file.name.replace(/\s+/g, '-')}`;
-    const filePath = path.join(process.cwd(), 'public/uploads', fileName);
     
-    // Write the file to the server
-    await writeFile(filePath, buffer);
+    // Upload to Vercel Blob
+    const blob = await put(fileName, file, {
+      access: 'public',
+    });
     
-    const fileUrl = `/uploads/${fileName}`;
-    
-    return NextResponse.json({ fileUrl });
+    // Return the URL of the uploaded file
+    return NextResponse.json({ fileUrl: blob.url });
   } catch (error) {
     console.error('Error uploading file:', error);
     return NextResponse.json({ error: "Error uploading file" }, { status: 500 });
